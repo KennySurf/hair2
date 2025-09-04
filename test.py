@@ -1,3 +1,6 @@
-from db.db_funcs import get_user_messages
+a = False
 
-print(get_user_messages('878392907'))
+if a:
+    print(1)
+else:
+    print(2)

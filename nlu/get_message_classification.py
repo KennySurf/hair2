@@ -1,13 +1,14 @@
-# classifire_logic/get_classifier.py
+# nlu/get_message_classification
 from services.gpt.gpt_client import send_to_gpt
 from db.db_funcs import get_user_messages
 
-def get_message_classification(user_id, message):
+def return_message_classification(user_id: str, message: str) -> str:
     prompt ="""
     Ты - NLU классификатор салона красоты. Твоя цель определять, к какой роли относится сообщение пользователя.
+    Обязательно смотри контекст всего диалога, чтобы точнее понять к чему пренадлежит последнее сообщение.
     Правила:
-    booking: хочет записаться (называет услугу/время/мастера или явно просит запись)
-    question: задаёт вопрос (цены, график, адрес, услуги и т.д.)
+    booking: всё что касается записи - (называет услугу/время/мастера или явно просит запись и т п)
+    question: задаёт вопрос вне записи - (интересуется ценами, графиком, адресом, какие вообще услуги у нас есть и т.д.)
     smalltalk: приветствие/прощание/вежливости без деловой сути
     other: иное
     
