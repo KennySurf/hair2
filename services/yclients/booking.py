@@ -10,11 +10,12 @@ HEADERS = {
     'Authorization': f'Bearer {getenv("YCLIENTS_TOKEN")}'
 }
 COMPANY_ID = getenv("YCLIENTS_COMPANY_ID")
-FROM_ID = getenv("YCLIENTS_FROM_ID")
+FORM_ID = getenv("YCLIENTS_FORM_ID")
 
 #testfields
 #serviceid 10928000
 #masterid 4066437
+#запись
 
 def get_services():
     url = f'https://api.yclients.com/api/v1/book_services/{COMPANY_ID}'
@@ -34,7 +35,7 @@ def get_masters(service_id):
     response_json = response.json()
     return {i['id']: i['name'] + ' ' + i['specialization'] for i in response_json.get('data', [])}
 
-def get_time(service_id, master_id, date):
+def get_time_api(service_id, master_id, date):
     url = f'https://api.yclients.com/api/v1/book_times/{COMPANY_ID}/{master_id}/{date}'
 
     body = {
@@ -54,13 +55,27 @@ def make_booking(phone, name, email, service_id, master_id, time):
         'fullname': name,
         'email': email,
         'appointments': [{
-            'id':FROM_ID,
+            'id': FORM_ID,
             'services': service_id,
             'staff_id': master_id,
             'datetime': time,
         }]
     }
 
-# print(get_time('10928000', '3766969', '2025-09-06'))
+    response = requests.post(url, json=body, headers=HEADERS)
+    response_json = response.json()
+    print(response_json)
+    return True if response.status_code == 201 else False
+
+def remove_booking():
+    url = f'https://api.yclients.com/api/v1/record/{COMPANY_ID}/{'1260434631'}'
+
+    response = requests.delete(url, headers=HEADERS)
+    response_json = response.json()
+    print(response_json)
+
+# print(get_time_api('18345550', '3766969', '2025-09-06'))
 # print(get_masters('10928000'))
+# make_booking('89918969092', 'test', 'test@gmail.com', '18345550', '3766969', '2025-09-06 16:00:00' )
+# remove_booking()
 # print(get_services())

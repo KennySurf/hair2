@@ -2,9 +2,9 @@ from openai.resources.containers.files import content
 from classifire_logic.booking.other_intent_logic import other_intent
 
 from db.db_funcs import get_state, update_state, update_services_id, get_services_id, update_master_id, update_date, \
-    get_master_id, get_date, update_time
+    get_master_id, get_date, update_time, get_time
 from services.gpt.gpt_client import send_to_gpt
-from services.yclients.booking import get_services, get_masters, make_booking, get_time
+from services.yclients.booking import get_services, get_masters, make_booking, get_time_api
 
 
 def answer_intent(user_id, user_message):
@@ -87,7 +87,7 @@ def answer_intent(user_id, user_message):
         print()
         print(f'выбранное время - {user_message}')
 
-        times = get_time(service_id, master_id, date)
+        times = get_time_api(service_id, master_id, date)
         print(f'перечень времён {times}')
         prompt = f"""
                     Проверь, доступно ли выбранное клиентом время.
@@ -117,14 +117,16 @@ def answer_intent(user_id, user_message):
 
         if reply:
             service_id = get_services_id(user_id)
-            master_id = get_master_id(service_id)
+            master_id = get_master_id(user_id)
             date = get_date(user_id)
             time = get_time(user_id)
 
             reply = eval(reply)
             time = send_to_gpt(
                 [{'role': 'system', 'content': f'верни верный формат datetime {date} {time} - Y-M-D H:m:s'}])
-            make_booking(reply[0], reply[1], reply[2], service_id, master_id, time)
-            reply = 'запись успешно создана'
+            if make_booking(reply[0], reply[1], reply[2], service_id, master_id, time):
+                reply = 'запись успешно создана'
+            else:
+                reply = 'Произошла ошибка при добавлении записи, попробуйте ещё раз'
 
     return reply if reply else 'я не совсем вас поняла, напишите ещё раз'

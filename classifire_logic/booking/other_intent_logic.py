@@ -1,7 +1,7 @@
 # classifire_logic/booking_classifier.py
 from db.db_funcs import get_state, get_services_id, get_date, update_state, get_time
 from services.gpt.gpt_client import send_to_gpt
-from services.yclients.booking import get_services, get_masters, get_time
+from services.yclients.booking import get_services, get_masters, get_time_api
 
 
 def other_intent(user_id):
@@ -46,7 +46,7 @@ def other_intent(user_id):
         master_id = get_masters(service_id)
         date = get_date(user_id)
 
-        times = get_time(service_id, master_id, date)
+        times = get_time_api(service_id, master_id, date)
 
         prompt = f"""Вежливо спроси на какое время клиент хочет записаться
            список доступного времени - {times}
