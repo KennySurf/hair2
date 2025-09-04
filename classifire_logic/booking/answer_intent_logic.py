@@ -50,32 +50,21 @@ def answer_intent(user_id, user_message):
         masters = list(get_masters(service_id).values())
 
         prompt = f"""
-        Проверь, присутствует ли в сообщении имя.
-        Если есть - выдели и верни имя из текста
-        Если нет - верни False
-        
-        Пример - давайте к Еве -> Ева и т д
-        """
+                    Проверь, есть ли выбранный клиентом мастер в нашем перечне.
+                    Выбранный мастер - {user_message}
+                    Наш перечень - {masters}
 
-        master = send_to_gpt([{'role': 'system', 'content': prompt}])
+                    Если имя выбранного мастера, встречется в нашем перечне - верни выбранного мастера так, как он записан в нашем перечне
+                    Если нет, верни False"""
 
-        if master != 'False':
-            prompt = f"""
-                        Проверь, есть ли выбранный клиентом мастер в нашем перечне.
-                        Выбранный мастер - {master}
-                        Наш перечень - {masters}
-    
-                        Если да, верни выбранного мастера
-                        Если нет, верни False"""
+        reply = send_to_gpt([{'role': 'system', 'content': prompt}] + user_message_prompt)
+        if reply != 'False':
+            master_id = list(get_masters(service_id).keys())[masters.index(reply)]
 
-            reply = send_to_gpt([{'role': 'system', 'content': prompt}] + user_message_prompt)
-            if reply != 'False':
-                master_id = list(get_masters(service_id).keys())[masters.index(reply)]
-
-                update_master_id(user_id, master_id)
-                update_state(user_id, 'get_date')
-                reply = send_to_gpt([{'role': 'system',
-                                      'content': f'вежливо озвучь клиенту что он выбрал мастера {reply} и спроси на какое число его записать'}])
+            update_master_id(user_id, master_id)
+            update_state(user_id, 'get_date')
+            reply = send_to_gpt([{'role': 'system',
+                                  'content': f'вежливо озвучь клиенту что он выбрал мастера {reply} и спроси на какое число его записать'}])
 
         else: return other_intent(user_id)
 
@@ -109,12 +98,13 @@ def answer_intent(user_id, user_message):
                     Если нет, верни False"""
 
         reply = send_to_gpt([{'role': 'system', 'content': prompt}] + user_message_prompt)
-        if reply:
+        if reply != 'False':
             update_time(user_id, reply)
             update_state(user_id, 'get_date')
             reply = send_to_gpt([{'role': 'system',
                                   'content': f'Вежливо спроси клиента на какое имя записать, номер телефона и почту'}])
             update_state(user_id, 'finish')
+        else: return 'На данное время нету записей, выберите другое'
 
     elif state == 'finish':
         prompt = f"""

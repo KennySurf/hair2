@@ -34,7 +34,7 @@ def get_masters(service_id):
     response_json = response.json()
     return {i['id']: i['name'] + ' ' + i['specialization'] for i in response_json.get('data', [])}
 
-def get_time(service_id, master_id, date,):
+def get_time(service_id, master_id, date):
     url = f'https://api.yclients.com/api/v1/book_times/{COMPANY_ID}/{master_id}/{date}'
 
     body = {
@@ -61,6 +61,6 @@ def make_booking(phone, name, email, service_id, master_id, time):
         }]
     }
 
-# print(get_time('10928000', '1924574', '2025-09-05'))
-# # print(get_masters('10928000'))
+# print(get_time('10928000', '3766969', '2025-09-06'))
+# print(get_masters('10928000'))
 # print(get_services())
