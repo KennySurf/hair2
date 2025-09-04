@@ -1,10 +1,10 @@
 from classifire_logic.question.get_question_intent import return_question_intent
 from docx import Document
 from services.gpt.gpt_client import send_to_gpt
-from db.db_funcs import add_message
+from db.db_funcs import add_message, get_user_messages
 
 def get_question_reply(user_id, user_message):
-    prompt = 'Опираясь на информацию из файла дай ответ по вопросу клиента'
+    prompt = 'Опираясь на информацию из файла дай ответ по вопросу клиента. Но только сам не упоминай, что ты опираешься на информацию из файла'
 
     intent = return_question_intent(user_message)
     reply = ''
@@ -12,6 +12,7 @@ def get_question_reply(user_id, user_message):
     if intent == 'все услуги':
         prompt = """
         Расскажи клиенту, какие у нас есть услуги - вот перечень.
+        Соблюдай правила доброжелательности, которые я устанавливал в самом первом сообщении.
             [
             "Наращивание волос",
             "Окрашивание волос",
@@ -37,8 +38,9 @@ def get_question_reply(user_id, user_message):
                 информация из файла: {full_text}"""
             }
         ]
+        messages = get_user_messages(user_id)
 
-        reply = send_to_gpt(input_prompt)
+        reply = send_to_gpt(messages[:-1] + input_prompt + messages[-1:])
 
     add_message(user_id, 'assistant', reply)
     return reply

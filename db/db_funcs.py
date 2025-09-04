@@ -92,3 +92,14 @@ def get_time(user_id):
         cursor = conn.cursor()
         cursor.execute('SELECT time FROM Users WHERE user_id = ?', (user_id,))
         return cursor.fetchone()[0]
+
+def reset_all_states(user_id):
+    with sqlite3.connect('users.sqlite') as conn:
+        cursor = conn.cursor()
+
+        cursor.execute('UPDATE Users SET state = ? WHERE user_id = ?', ('idle', user_id))
+        cursor.execute('UPDATE Users SET services_id = ? WHERE user_id = ?', (None, user_id))
+        cursor.execute('UPDATE Users SET master_id = ? WHERE user_id = ?', (None, user_id))
+        cursor.execute('UPDATE Users SET date = ? WHERE user_id = ?', (None, user_id))
+        cursor.execute('UPDATE Users SET time = ? WHERE user_id = ?', (None, user_id))
+        conn.commit()

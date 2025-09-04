@@ -1,8 +1,6 @@
-from openai.resources.containers.files import content
 from classifire_logic.booking.other_intent_logic import other_intent
-
 from db.db_funcs import get_state, update_state, update_services_id, get_services_id, update_master_id, update_date, \
-    get_master_id, get_date, update_time, get_time
+    get_master_id, get_date, update_time, get_time, reset_all_states
 from services.gpt.gpt_client import send_to_gpt
 from services.yclients.booking import get_services, get_masters, make_booking, get_time_api
 
@@ -126,6 +124,7 @@ def answer_intent(user_id, user_message):
                 [{'role': 'system', 'content': f'верни верный формат datetime {date} {time} - Y-M-D H:m:s'}])
             if make_booking(reply[0], reply[1], reply[2], service_id, master_id, time):
                 reply = 'запись успешно создана'
+                reset_all_states(user_id)
             else:
                 reply = 'Произошла ошибка при добавлении записи, попробуйте ещё раз'
 
