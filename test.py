@@ -1,4 +1,3 @@
-a = "('номер телефона пользователя', 'имя пользователя', 'почта пользователя')"
+from db.db_funcs import get_user_messages
 
-a = eval(a)
-print(a)
+print(get_user_messages('878392907'))

@@ -7,7 +7,7 @@ def create_table():
 
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS Users (
-        state TEXT DEFAULT get_services,
+        state TEXT DEFAULT idle,
         user_id INTEGER UNIQUE,
         services_id INTEGER DEFAULT NULL,
         master_id INTEGER DEFAULT NULL,

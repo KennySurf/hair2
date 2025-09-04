@@ -63,3 +63,4 @@ def make_booking(phone, name, email, service_id, master_id, time):
 
 # print(get_time('10928000', '1924574', '2025-09-05'))
 # # print(get_masters('10928000'))
+# print(get_services())

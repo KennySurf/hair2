@@ -42,20 +42,20 @@ def get_state(user_id):
         cursor = conn.cursor()
         cursor.execute('SELECT state FROM Users WHERE user_id = ?', (user_id,))
         state = cursor.fetchone()
-        return state
+        return state[0]
 
 def update_services_id(user_id, service_id):
     with sqlite3.connect('users.sqlite') as conn:
         cursor = conn.cursor()
-        cursor.execute('UPDATE Users SET service_id = ? WHERE user_id = ?', (service_id, user_id))
+        cursor.execute('UPDATE Users SET services_id = ? WHERE user_id = ?', (service_id, user_id))
 
         conn.commit()
 
 def get_services_id(user_id):
     with sqlite3.connect('users.sqlite') as conn:
         cursor = conn.cursor()
-        cursor.execute('SELECT service_id FROM Users WHERE user_id = ?', (user_id,))
-        return cursor.fetchone()
+        cursor.execute('SELECT services_id FROM Users WHERE user_id = ?', (user_id,))
+        return cursor.fetchone()[0]
 
 def update_master_id(user_id, master_id):
     with sqlite3.connect('users.sqlite') as conn:
@@ -67,13 +67,13 @@ def get_master_id(user_id):
     with sqlite3.connect('users.sqlite') as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT master_id FROM Users WHERE user_id = ?', (user_id,))
-        return cursor.fetchone()
+        return cursor.fetchone()[0]
 
 def get_date(user_id):
     with sqlite3.connect('users.sqlite') as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT date FROM Users WHERE user_id = ?', (user_id,))
-        return cursor.fetchone()
+        return cursor.fetchone()[0]
 
 def update_date(user_id, date):
     with sqlite3.connect('users.sqlite') as conn:
@@ -91,4 +91,4 @@ def get_time(user_id):
     with sqlite3.connect('users.sqlite') as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT time FROM Users WHERE user_id = ?', (user_id,))
-        return cursor.fetchone()
+        return cursor.fetchone()[0]
