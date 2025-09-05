@@ -1,6 +1,4 @@
-a = False
+from datetime import datetime
 
-if a:
-    print(1)
-else:
-    print(2)
+
+print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))

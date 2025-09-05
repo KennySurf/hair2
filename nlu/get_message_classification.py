@@ -9,6 +9,7 @@ def return_message_classification(user_id: str, message: str) -> str:
     Правила:
     booking: всё что касается записи - (называет услугу/время/мастера или явно просит запись и т п)
     question: задаёт вопрос вне записи - (интересуется ценами, графиком, адресом, какие вообще услуги у нас есть, описанием услуг и т.д.)
+    tryon_request: запрос на примерку услуги, например, "хочу примерить", "давайте попробуем", "как будет выглядеть эта прическа"
     smalltalk: приветствие/знакомство/представление своего имени/прощание/вежливости без деловой сути
     other: иное
     
@@ -16,9 +17,6 @@ def return_message_classification(user_id: str, message: str) -> str:
     Если ты думаешь, что сообщение может принадлежать к нескольким ролям - выводи старшую роль - правила сверху вниз.
     """
     messages = get_user_messages(user_id)
-
-    # classifier_message = [{'role': 'system', 'content': prompt},
-    #                       {'role': 'user', 'content': message}]
 
     classifier_message = messages[1:-1] + [{'role': 'system', 'content': prompt}] + [messages[-1]]
 

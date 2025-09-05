@@ -12,7 +12,9 @@ def create_table():
         services_id INTEGER DEFAULT NULL,
         master_id INTEGER DEFAULT NULL,
         date TEXT DEFAULT NULL,
-        time TEXT DEFAULT NULL);
+        time TEXT DEFAULT NULL,
+        end_cooldown_time DEFAULT NULL,
+        tryon_state TEXT DEFAULT idle);
     ''')
 
     cursor.execute('''
