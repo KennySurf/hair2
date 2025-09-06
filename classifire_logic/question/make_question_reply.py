@@ -4,28 +4,33 @@ from docx import Document
 from services.gpt.gpt_client import send_to_gpt
 from db.db_funcs import add_message, get_user_messages
 from db.tryon_db_funcs import get_end_cooldown_time, update_end_cooldown_time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def get_question_reply(user_id, user_message):
+    history_user_messages = get_user_messages(user_id)
 
     intent = return_question_intent(user_message)
     reply = ''
 
     if intent == 'все услуги':
-        reply = send_to_gpt([{'role': 'system', 'content': all_services_intent_prompt}])
+        reply = send_to_gpt(history_user_messages + [{'role': 'system', 'content': all_services_intent_prompt}])
     else:
         try_on_closer = ''
 
         if (intent in ("Наращивание волос", "Окрашивание волос", "Стрижка волос")
-            and datetime.strptime(get_end_cooldown_time(user_id), "%Y-%m-%d %H:%M:%S") < datetime.now()):
+            and (get_end_cooldown_time(user_id) is None or
+                 datetime.strptime(get_end_cooldown_time(user_id), "%Y-%m-%d %H:%M:%S") < datetime.now())):
             print()
             print('QUESTION_TRY_ON_FUNC')
 
             try_on_closer = """
-            Если клиент говорит о какой то услуге, спроси его - не хочет ли он её примерить на себе
+            Если клиент говорит о какой то услуге, спроси его - не хочет ли он её примерить на себе - сообщи, что мы могли бы визуализировать.
             """
 
-            update_end_cooldown_time(user_id, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            updated_cooldown_time = datetime.now() + timedelta(hours=6)
+            print()
+            print(f'updated_cooldown_time: {updated_cooldown_time}')
+            update_end_cooldown_time(user_id, updated_cooldown_time.strftime('%Y-%m-%d %H:%M:%S'))
 
         file = f'classifire_logic/question/files/{intent.lower()}.docx'
         doc = Document(file)
@@ -62,6 +67,6 @@ all_services_intent_prompt = """
         "Окрашивание и ламинирование бровей",
         "Продажа волос"
          ]
-    Спроси клиента, рассказать ли ему о какой то конкретной услуги?
+    Вежливо спроси клиента, хочет ли он, чтобы мы рассказали ему о какой то конкретной услуге
     """
 

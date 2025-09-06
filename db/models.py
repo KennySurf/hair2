@@ -14,7 +14,8 @@ def create_table():
         date TEXT DEFAULT NULL,
         time TEXT DEFAULT NULL,
         end_cooldown_time DEFAULT NULL,
-        tryon_state TEXT DEFAULT idle);
+        tryon_state TEXT DEFAULT idle,
+        tryon_prompt TEXT DEFAULT NULL);
     ''')
 
     cursor.execute('''

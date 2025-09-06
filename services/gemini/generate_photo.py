@@ -1,44 +1,37 @@
-import google.genai as genai
+from google import genai
 from google.genai import types
 from PIL import Image
-from io import BytesIO
-from os import getenv
 from dotenv import load_dotenv
-import base64
+from os import getenv
+from io import BytesIO
+from services.gpt.proxy import set_proxy, clear_proxy
 
-# Загрузка переменных окружения из .env файла
-load_dotenv()
 
-# Получение API ключа
-api_key = getenv('GEMINI_API_KEY')
+def generate_img(user_id, user_prompt):
+    load_dotenv()
 
-# Инициализация клиента с API ключом
-client = genai.Client(api_key=api_key)
+    set_proxy()
+    client = genai.Client(api_key=getenv("GEMINI_API_KEY"))
+    clear_proxy()
 
-# Путь к изображению
-image_path = "../../static/test.jpg"
-
-# Чтение изображения
-with open(image_path, "rb") as image_file:
-    image_data = image_file.read()
-
-# Преобразуем изображение в формат base64
-image_base64 = base64.b64encode(image_data).decode('utf-8')
-
-# Запрос к модели Gemini API для редактирования изображения
-response = client.models.generate_content(
-    model="gemini-2.5-flash-image-preview",
-    contents=[
-        "Remove the background from this image and replace it with a snowy mountain vista.",
-        image_base64  # Передаем изображение как строку base64
-    ],
-    config=types.GenerateContentConfig(
-        response_modalities=["IMAGE"]
+    prompt = (f"""
+        {user_prompt}
+        Keep the person exactly as in the original photo (same face, pose, clothes, colors).
+        No new characters, no stylization. Photorealistic."""
     )
-)
 
-# Сохранение отредактированного изображения
-for part in response.candidates[0].content.parts:
-    if part.inline_data:
-        edited_image = Image.open(BytesIO(part.inline_data.data))
-        edited_image.save("edited_image.jpg")
+    print(prompt)
+
+    img = Image.open(rf"static/{user_id}/input_img/input.jpg")  # можно .png/.jpg
+
+    resp = client.models.generate_content(
+        model="gemini-2.5-flash-image-preview",
+        contents=[prompt, img],
+        config=types.GenerateContentConfig(response_modalities=["IMAGE"]),
+    )
+
+    for part in resp.candidates[0].content.parts:
+        if getattr(part, "inline_data", None):
+            with open(rf"static/{user_id}/output_img/output.jpg", "wb") as f:
+                f.write(part.inline_data.data)
+                print('сгенерировано')

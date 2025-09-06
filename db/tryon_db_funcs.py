@@ -37,3 +37,24 @@ def reset_tryon_state(user_id):
 
         cursor.execute('UPDATE Users SET tryon_state = ? WHERE user_id = ?', ('idle', user_id))
         conn.commit()
+
+def get_tryon_prompt(user_id):
+    with sqlite3.connect('users.sqlite') as conn:
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT tryon_prompt FROM Users WHERE user_id = ?', (user_id,))
+        return cursor.fetchone()[0]
+
+def update_tryon_prompt(user_id, prompt):
+    with sqlite3.connect('users.sqlite') as conn:
+        cursor = conn.cursor()
+
+        cursor.execute('UPDATE Users SET tryon_prompt = ? WHERE user_id = ?', (prompt, user_id))
+        conn.commit()
+
+def reset_tryon_prompt(user_id):
+    with sqlite3.connect('users.sqlite') as conn:
+        cursor = conn.cursor()
+
+        cursor.execute('UPDATE Users SET tryon_prompt = ? WHERE user_id = ?', (None, user_id))
+        conn.commit()
