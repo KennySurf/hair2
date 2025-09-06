@@ -1,12 +1,13 @@
 from classifire_logic.booking.other_intent_logic import other_intent
 from db.db_funcs import get_state, update_state, update_services_id, get_services_id, update_master_id, update_date, \
-    get_master_id, get_date, update_time, get_time, reset_all_states
+    get_master_id, get_date, update_time, get_time, reset_all_states, get_user_messages
 from services.gpt.gpt_client import send_to_gpt
 from services.yclients.booking import get_services, get_masters, make_booking, get_time_api
 
 
 def answer_intent(user_id, user_message):
     user_message_prompt = [{'role': 'user', 'content': user_message}]
+    history_user_messages = get_user_messages(user_id)
     state = get_state(user_id)
     reply = ''
     print(f'state - {state}')
@@ -16,10 +17,21 @@ def answer_intent(user_id, user_message):
         services = get_services().values()
         prompt = f"""
            Вежливо спроси какая из списка услуга клиента интересует.
-           Список услуг: {services}
+           Список услуг:     [
+    "Наращивание волос",
+    "Окрашивание волос",
+    "Стрижка волос",
+    "Укладки и мейк",
+    "Уход за волосами",
+    "Окрашивание и ламинирование бровей",
+    "Продажа волос"
+    ]
            """
+        # Список услуг: {services}
         update_state(user_id, 'get_services')
-        reply = send_to_gpt([{'role': 'system', 'content': prompt}])
+        reply = send_to_gpt(history_user_messages + [{'role': 'system', 'content': prompt}])
+        #reply = send_to_gpt([{'role': 'system', 'content': prompt}])
+
 
     if state == 'get_services':
         services = list(get_services().values())
@@ -40,7 +52,7 @@ def answer_intent(user_id, user_message):
 
             update_state(user_id, 'get_masters')
             update_services_id(user_id, service_id)
-            reply = send_to_gpt([{'role': 'system',
+            reply = send_to_gpt(history_user_messages + [{'role': 'system',
                                   'content': f'вежливо озвучь клиенту что он выбрал услугу {reply} и спроси хочет ли он к какому то конкрентому мастеру, или мне дать список мастеров. Не спрашивай критерии для списка - просто тут логика или клиент знает уже к какому мастеру он хочет, или мы предоставим ему список всех мастеров по услуге'}])
 
     elif state == 'get_masters':
