@@ -21,6 +21,7 @@ def get_tryon_accept_reply(user_id, user_message):
     if tryon_state == 'getting_a_prompt':
         start_prompt = """
         Сгенерируй промпт для изменения фотографии пользователя, опираясь на его желания по изменению.
+        Самое главное промпт не должен менять человека, фон, позу, лицо или что то такое, он должен только корректировать прическу.
         Промпт должен быть на английском.
         Если пользователь говорит не о изменении прически, верни - не прическа
         Больше ничего не выводи - или только промпт на английском, или не прическа.
@@ -35,12 +36,13 @@ def get_tryon_accept_reply(user_id, user_message):
             """
         else:
             reply_prompt = """
-            Вежливо попроси у пользователя фотографию
+            Вежливо попроси клиента отправить одну портретную фотографию.
+            Не спрашивай готов ли он, а именно попроси отправить фотографию.
             """
             update_tryon_prompt(user_id, user_prompt)
             update_tryon_state(user_id, 'getting_image')
 
-        return send_to_gpt([{'role': 'system', 'content': reply_prompt}])
+        return send_to_gpt(history_user_messages + [{'role': 'system', 'content': reply_prompt}])
 
     if tryon_state == 'getting_image':
         prompt = """

@@ -41,7 +41,7 @@ async def image_cather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text('Фотография принята, ожидайте генерации')
 
     prompt = get_tryon_prompt(user_id)
-    await generate_img(user_id, prompt)
+    generate_img(user_id, prompt)
 
     with open(f'static/{user_id}/output_img/output.jpg', 'rb') as f:
         await update.message.reply_photo(photo=f)

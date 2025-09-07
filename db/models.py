@@ -15,7 +15,8 @@ def create_table():
         time TEXT DEFAULT NULL,
         end_cooldown_time DEFAULT NULL,
         tryon_state TEXT DEFAULT idle,
-        tryon_prompt TEXT DEFAULT NULL);
+        tryon_prompt TEXT DEFAULT NULL,
+        price_question_state TEXT DEFAULT idle);
     ''')
 
     cursor.execute('''
