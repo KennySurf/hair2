@@ -8,7 +8,7 @@ def get_booking_reply(user_id, user_message):
     state = get_state(user_id)
     user_messages = get_user_messages(user_id)
 
-    intent = return_booking_intent(user_message)
+    intent = return_booking_intent(user_id, user_message)
     if intent == 'answer':
         print(user_message)
         reply = answer_intent(user_id, user_message)
