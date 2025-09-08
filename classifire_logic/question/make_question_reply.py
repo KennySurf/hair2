@@ -5,11 +5,11 @@ from classifire_logic.question.service_cost.service_cost import get_service_cost
 from classifire_logic.question.service import get_service_reply
 
 def get_question_reply(user_id, user_message):
-    intent = return_question_intent(user_id, user_message)
+    intent = return_question_intent(user_id, user_message).lower()
 
     if intent == 'все услуги':
         return get_all_services_reply(user_id)
-    elif intent == 'Вопрос цены':
+    elif intent == 'вопрос цены':
         return get_service_cost_reply(user_id)
     else:
         return get_service_reply(user_id, intent)

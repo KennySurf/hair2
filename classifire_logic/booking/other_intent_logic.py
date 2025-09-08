@@ -1,60 +1,32 @@
 # classifire_logic/booking_classifier.py
-from db.db_funcs import get_state, get_services_id, get_date, update_state, get_time
+from db.db_funcs import get_state, get_services_id, get_date, update_state, get_time, get_user_messages
 from services.gpt.gpt_client import send_to_gpt
-from services.yclients.booking import get_services, get_masters, get_time_api
+from docx import Document
 
 
 def other_intent(user_id):
-    state = get_state(user_id)
-    print()
-    print(f'state: {state}')
-    prompt = ''
+    messages = get_user_messages(user_id)
 
-    if state == 'idle':
-        services = get_services().values()
-        prompt = f"""
-              Вежливо спроси какая из списка услуга клиента интересует.
-              Список услуг: {services}
-              """
-        update_state(user_id, 'get_services')
+    file = f'classifire_logic/question/files/общее положение.docx'
+    doc = Document(file)
+    full_text = "\n".join([para.text for para in doc.paragraphs])
 
-    elif state == 'get_services':
-        services = get_services().values()
-        prompt = f"""
-           Вежливо спроси какая услуга клиента интересует.
-           Список услуг: {services}
-           """
+    prompt = f"""
+    Ответь на вопрос клиента опираясь на знания из файла. Только не говори, откуда ты берёшь информацию.
+    После ответа вежливо спроси в новом абзаце - хочет ли клиент продолжить запись?
+    Но если клиент спрашивает цену наращивания или окрашивания - строго верни ответ - цена
+        
+    Информация из файла - 
+    {full_text}
+    """
 
+    reply = send_to_gpt(messages[:-1] + [{'role': 'system', 'content': prompt}] + messages[-1:])
 
-    elif state == 'get_masters':
-        service_id = get_services_id(user_id)
-        masters = get_masters(service_id)
+    if reply.lower() == 'цена':
+        price_prompt = """
+        вежливо ответь клиенту, что цену можем озвучить только на консультации, объясни почему и спроси хочет ли он записаться на неё?
+        """
+        update_state(user_id, 'get_advice')
 
-        prompt = f"""
-           Вежливо спроси имя мастера, к которому клиент хочет записаться.
-           Список мастеров: {masters.values()}
-           """
-
-    elif state == 'get_date':
-        prompt = f"""
-           Вежливо спроси на какую дату клиент хочет записаться.
-           """
-        update_state(user_id, 'get_time')
-
-    elif state == 'get_time':
-        service_id = get_services_id(user_id)
-        master_id = get_masters(service_id)
-        date = get_date(user_id)
-
-        times = get_time_api(service_id, master_id, date)
-
-        prompt = f"""Вежливо спроси на какое время клиент хочет записаться
-           список доступного времени - {times}
-           Если список пуст - скажи что сегодня нет свободного времени у мастера"""
-
-    elif state == 'finish':
-        prompt = f"""
-        Вежливо спроси клиента на какое имя записать, номер телефона и почту"""
-
-    reply = send_to_gpt([{'role': 'system', 'content': prompt}])
+        reply = send_to_gpt(messages + [{'role': 'system', 'content': price_prompt}])
     return reply

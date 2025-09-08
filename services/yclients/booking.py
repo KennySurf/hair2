@@ -78,6 +78,6 @@ def remove_booking():
 # print(get_masters('10928000'))
 # make_booking('89918969092', 'test', 'test@gmail.com', '18345550', '3766969', '2025-09-06 16:00:00' )
 # remove_booking()
-print(get_services())
+# print(get_services())
 # for i in get_services().items():
     # print(i)

@@ -9,8 +9,9 @@ def idle(user_id, user_messages,):
 
     prompt = """
     Правила (приоритет сверху вниз):
+    Возьми последнее сообщение.
     
-    1. Если имя клиента уже известно — выведи строго: знаю имя.
+    1. Если имя клиента уже было известно до этого — выведи строго: знаю имя.
     
     2. Если пользователь задаёт вопрос про услуги (цены, процедуры, материалы, процесс и т.п.) —
        ответ должен содержать ровно две части:
@@ -26,7 +27,7 @@ def idle(user_id, user_messages,):
     — добавлять что-то помимо разрешённых фраз.
                """
 
-    idle_reply = send_to_gpt(user_messages + [{'role': 'system', 'content': prompt}])
+    idle_reply = send_to_gpt([{'role': 'system', 'content': prompt}] + user_messages)
 
     if idle_reply == 'знаю имя':
         update_price_question_state(user_id, 'get_hook')
