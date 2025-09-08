@@ -6,8 +6,13 @@ from db.tryon_db_funcs import get_tryon_prompt, reset_tryon_prompt, reset_tryon_
 from services.gemini.generate_photo import generate_img
 import os
 from services.gpt.gpt_client import send_to_gpt
+from db.models import clear_table, run_table
 
-
+async def restart(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    clear_table()
+    run_table()
+    print()
+    print('произошёл рестарт')
 
 async def text_catcher(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id

@@ -36,3 +36,17 @@ def run_table():
         return
     print('Table creation')
     create_table()
+
+def clear_table():
+    conn = sqlite3.connect('users.sqlite')
+    cursor = conn.cursor()
+
+    # Очистить таблицу Users
+    cursor.execute('DELETE FROM Users')
+
+    # Очистить таблицу Messages
+    cursor.execute('DELETE FROM Messages')
+
+    conn.commit()
+    conn.close()
+    print("All data has been cleared from the tables.")

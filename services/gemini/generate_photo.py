@@ -31,6 +31,7 @@ def generate_img(user_id, user_prompt):
     )
 
     for part in resp.candidates[0].content.parts:
+        print("DEBUG PART:", part)
         if getattr(part, "inline_data", None):
             with open(rf"static/{user_id}/output_img/output.jpg", "wb") as f:
                 f.write(part.inline_data.data)
